@@ -29,17 +29,17 @@ export default function LoginForm({ navigation, signIn }) {
   obtenerUser();
 
   const Loguear = async (id, nom, ape, token) => {
-    console.log("info: ", id);
+   // console.log("info: ", id);
     await AsyncStorage.setItem("id_user", id.toString());
     await AsyncStorage.setItem("nombre", nom.toString());
     await AsyncStorage.setItem("apellidos", ape.toString());
 
-    // const payload = {
-    //   tokenPush: token,
-    //   name: nom,
-    //   last_name: ape,
-    // };
-    // await API.put(`accounts/${id}/`, payload);
+    const payload = {
+      tokenPush: token,
+      name: nom,
+      last_name: ape,
+    };
+    await API.put(`accounts/${id}/`, payload);
     signIn();
   };
 

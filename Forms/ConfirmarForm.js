@@ -32,13 +32,18 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
   useEffect(() => {
     const fetch = async () => {
       const response = await API.get(`typeservices?format=json`);
+
+      //console.log(response.data)
+      setListTipoServ(response.data);
+     // console.log("Info: ", listTipoServ)
+
       let location = await Location.getCurrentPositionAsync({});
 
       setUbicacion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
-      setListTipoServ(response.data);
+      
     };
     fetch();
     // buscarLocation()
@@ -90,6 +95,7 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
         pedido: parseInt(response2.data.id),
         realizado_by: parseInt(id_user),
       };
+      
       setIsVisibleLoading(false);
       const response3 = await API.post(`activiorders/`, logs_pedido);
 
@@ -156,6 +162,7 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
             placeholderTextColor="black"
             mt={1}
           >
+           
             {listTipoServ.map((serv) => (
               <Select.Item label={serv.nombre} value={serv.id} key={serv.id} />
             ))}
