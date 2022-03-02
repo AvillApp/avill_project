@@ -17,6 +17,7 @@ import Confirmar from "../Screens/Confirmar";
 import Estado from "../Screens/Estado";
 import Chat from "../Screens/Chat";
 import Viajes from "../Screens/Viajes";
+import Perfil from "../Screens/Perfil";
 
 const PortalStack = createStackNavigator(); // Panel de realizar los pedidos y ver el estado
 const ViajesStack = createStackNavigator(); // Panel de realizar los pedidos y ver el estado
@@ -127,12 +128,14 @@ function CustomDrawerContent({ progress, ...rest }) {
   //   outputRange: [-100, 0],
   // });
 
+  
+
   return (
     <DrawerContentScrollView {...rest}>
       <Animated.View>
         <DrawerItemList {...rest} />
-          <DrawerItem label="Términos y condiciones" onPress={() => alert('Link to help')} />
-          <DrawerItem label="Salir" onPress={() => alert('Link to help')} />
+          {/* <DrawerItem label="Términos y condiciones" onPress={() => alert('Link to help')} />
+          <DrawerItem label="Salir" onPress={() => CerraCuenta()} /> */}
 
       </Animated.View>
     </DrawerContentScrollView>
@@ -161,12 +164,13 @@ export default AppDrawerScreen = () => (
         };
       }}
     />
-    {/* <AppDrawer.Screen
-      name="Settings"
+    {<AppDrawer.Screen
+      name="Perfil"
+      component={Perfil}
       options={{
-        drawerLabel: "Salir",
+        drawerLabel: "Perfil",
         gestureEnabled: false,
       }} 
-    /> */}
+    />}
   </AppDrawer.Navigator>
 );

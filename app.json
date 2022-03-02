@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "avill_project",
-    "slug": "avill_project",
+    "name": "Avill",
+    "slug": "Avill",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icons/icon.png",
@@ -24,8 +24,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.conductoravill.io",
-      "versionCode": 3,
+      "package": "com.avill.io",
+      "versionCode": 5,
       "permissions": [
         "NOTIFICATIONS"
       ],

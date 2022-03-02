@@ -213,11 +213,16 @@ export default function PedidoForm({ navigation, pedido }) {
   };
 
   const Calificar = async () => {
-    const payloadAccount = {
-      puntos: puntos,
-      account: conductor.id,
-      realizado_by: infoViaje.id,
-    };
+
+    if(conductor.id){
+      const payloadAccount = {
+        puntos: puntos,
+        account: conductor.id,
+        realizado_by: infoViaje.id,
+      };
+      await API.post(`ratting/account/`, payloadAccount);
+    }
+   
 
     const payloadPedido = {
       puntos: puntos,
@@ -226,7 +231,8 @@ export default function PedidoForm({ navigation, pedido }) {
     };
 
     // Registramos calificació al conductor
-    await API.post(`ratting/account/`, payloadAccount);
+    
+   
     // Registramos calificació del pedido
     await API.post(`ratting/order/`, payloadPedido);
     setDisableRatting(true);

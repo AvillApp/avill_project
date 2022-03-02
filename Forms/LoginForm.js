@@ -25,7 +25,6 @@ export default function LoginForm({ navigation, signIn }) {
     const id_pedido = await AsyncStorage.getItem("id_pedido");
     if (id_user) // console.log("Va a iniciar sesion ") 
       signIn();
-   // if (id_pedido) navigation.navigate("Estado");
   };
   obtenerUser();
 

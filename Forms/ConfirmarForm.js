@@ -84,13 +84,17 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
 
       await AsyncStorage.setItem("pedido", response2.data.id.toString());
 
-      const payload ={
-        longitude: ubicacion.longitude,
-        latitude: ubicacion.latitude,
+      if (ubicacion.longitude && ubicacion.latitude){
+        const payload ={
+          longitude: ubicacion.longitude,
+          latitude: ubicacion.latitude,
+        }
+        
+        console.log("info de coordenadas: ", payload)
+        // Atrapamos coordenada actualizada del usuario..
+        await API.put(`accounts/${parseInt(id_user)}/`, payload);
       }
-
-      // Atrapamos coordenada actualizada del usuario..
-      await API.put(`accounts/${parseInt(id_user)}/`, payload);
+      
      
       
       // Enviamos primera información

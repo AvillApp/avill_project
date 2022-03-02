@@ -20,42 +20,17 @@ import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API from "../Lib/Db";
 
-export default function PerfilForm({ navigation, signIn, signUp }) {
-//   const [data, setData] = useState([]);
-//   const [msg, setMsg] = useState();
-
-//   const getIdpedido = async () => {
-//     const response = await API.get(`chat/order/?pedido=${pedido}&ordering=-id&format=json`);
-//     const resUser = response.data;
-//     setData(resUser); // Logs
-//   };
-
-
-//   useEffect(() => {
-   
-//       const interval = setInterval(() => {
-//         getIdpedido();
-//       }, 2000);
-
-//       return () => {
-//         clearInterval(interval);
-//       };
-//   }, []);
+export default function PerfilForm({ navigation, signOut }) {
 
   const CerraCuenta = async () => {
-    console.log("Hizo clic");
-
-    const payload = {
-        msg: msg,
-        pedido: pedido,
-        account: account
+    const id_user = await AsyncStorage.getItem("id_user");
+    const remove = await AsyncStorage.removeItem("id_user");
+    const id_user2 = await AsyncStorage.getItem("id_user");
+    const id_pedido = await AsyncStorage.removeItem("pedido");
+    
+    if (!id_user2){ 
+        signOut()
     }
-
-    await API.post(`chat/order/`, payload);
-    setMsg('')
-    // navigation.navigate("Estado", {
-    //   pedido: id,
-    // });
   };
   return (
     <>
@@ -67,7 +42,7 @@ export default function PerfilForm({ navigation, signIn, signUp }) {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         styles={styles.fondo}
       >
-        <VStack p="2" flex="1">
+        {/* <VStack p="2" flex="1">
           <FlatList
             data={data}
             renderItem={({ item }) => (
@@ -95,25 +70,17 @@ export default function PerfilForm({ navigation, signIn, signUp }) {
             )}
             keyExtractor={(item) => item.id}
           />
-        </VStack>
-        <Input
-            style={{ fontSize: 20, color: "black" }}
-            placeholder="Introduzca su mensaje"
-            mt="15"
-            mb="2"
-            variant="underlined"
-            value={msg}
-            onChange={(e) => setMsg(e.nativeEvent.text)}
-          />
+        </VStack> */}
+        
          <Button
             mb="2"
-            colorScheme="yellow"
+            colorScheme="red"
             key="lg"
             size="lg"
             variant="solid"
-            onPress={() => HandleSeguimiento()}
+            onPress={() => CerraCuenta()}
           >
-            Enviar
+            Cerrar Sesión
           </Button>
       </KeyboardAvoidingView>
     </>
