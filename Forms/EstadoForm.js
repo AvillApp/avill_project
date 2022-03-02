@@ -5,7 +5,7 @@ import {
   VStack,
   Text,
   Select,
-  Container,
+  Button
 } from "native-base";
 import { Avatar, List } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -88,6 +88,8 @@ export default function PedidoForm({ navigation, pedido }) {
       }
       if (resUser.vehiculo !== null) {
         if (conductor.nombre === "") {
+
+         
           setConductor({
             nombre:
               resUser.vehiculo.persona.name +
@@ -173,13 +175,6 @@ export default function PedidoForm({ navigation, pedido }) {
         clearInterval(interval);
       };
     }
-
-    // const timer = setTimeout(() => {
-    //   getInfo();
-    // }, 2000);
-    // return () => {
-    //   clearTimeout(timer);
-    // };
   }, []);
 
   const labels = [
@@ -241,6 +236,16 @@ export default function PedidoForm({ navigation, pedido }) {
 
     navigation.goBack("Inicio");
   };
+
+
+  const Chatear = () => {
+    console.log("Dato de la cuenta: ", infoViaje.id)
+    navigation.navigate("Chat", {
+      pedido: pedido,
+      account: infoViaje.id, 
+    });
+
+  }
 
   return (
     <>
@@ -322,6 +327,15 @@ export default function PedidoForm({ navigation, pedido }) {
                 >
                   <Select.Item key="8" label="Cancelar" value="8" />
                 </Select>
+                <Button
+                  colorScheme="yellow"
+                  key="lg"
+                  size="lg"
+                  variant="solid"
+                  onPress={() => Chatear()}
+                >
+                Chat
+                </Button>
               </View>
             )}
             {seguimiento === 5 && (

@@ -1,11 +1,14 @@
-import React from "react";
-import { Container } from "native-base";
+import React, { useState } from "react";
+import { NativeBaseProvider } from "native-base";
+import { AuthContext } from "../config/Context";
 import RegisterForm from "../../Forms/RegisterForm";
 
-export default function Register({ navigation }) {
+export default function App({ navigation }) {
+  const { signUp } = React.useContext(AuthContext);
   return (
-    <Container style={{ flex: 1 }}>
-      <RegisterForm navigation={navigation} />
-    </Container>
+    <NativeBaseProvider>
+        <RegisterForm signIn={signUp} navigation={navigation} />
+    </NativeBaseProvider>
   );
 }
+

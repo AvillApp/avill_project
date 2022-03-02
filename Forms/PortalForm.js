@@ -44,15 +44,24 @@ export default function PortalForm({ navigation, signIn }) {
     });
   };
 
+
   const getSearch = async () => {
     const lat = await AsyncStorage.getItem("latitude");
     const long = await AsyncStorage.getItem("longitude");
+    const id_pedido = await AsyncStorage.getItem("pedido");
 
     setUbicacion({
       latitude: parseFloat(lat),
       longitude: parseFloat(long),
     });
     setSarchLoc(true);
+    if (id_pedido){
+      navigation.navigate("Estado", {
+        pedido: id_pedido 
+      });
+    }
+    //console.log("tiene pedido activo")
+
   };
 
   useEffect(() => {
@@ -85,8 +94,16 @@ export default function PortalForm({ navigation, signIn }) {
             value={Direccion}
             onChange={(e) => setDireccion(e.nativeEvent.text)}
           />
-          <AppButton action={NuevoPedido} title="IR" />
 
+          <Button
+            colorScheme="yellow"
+            key="lg"
+            size="lg"
+            variant="solid"
+            onPress={() => NuevoPedido()}
+          >
+            IR
+          </Button>
           <Text>{"\n"}</Text>
           {ubicacion.latitude !== "" && (
             <MapView

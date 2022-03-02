@@ -8,7 +8,7 @@ import {
   Text,
   TextArea,
   Select,
-  Container,
+  Button,
 } from "native-base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AppButton from "../Lib/AppButton";
@@ -32,10 +32,7 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
   useEffect(() => {
     const fetch = async () => {
       const response = await API.get(`typeservices?format=json`);
-
-      //console.log(response.data)
       setListTipoServ(response.data);
-     // console.log("Info: ", listTipoServ)
 
       let location = await Location.getCurrentPositionAsync({});
 
@@ -80,11 +77,22 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
         account: parseInt(id_user),
         solicitud: servicio,
       };
-      console.log(pedido);
+
+     // console.log(pedido);
+      //Enviamos orden.
       const response2 = await API.post(`orders/`, pedido);
 
       await AsyncStorage.setItem("pedido", response2.data.id.toString());
 
+      const payload ={
+        longitude: ubicacion.longitude,
+        latitude: ubicacion.latitude,
+      }
+
+      // Atrapamos coordenada actualizada del usuario..
+      await API.put(`accounts/${parseInt(id_user)}/`, payload);
+     
+      
       // Enviamos primera información
       const titulo = "Solicitud de servicio seguro ";
       const descripcion = "Haz solicitado un(a) " + servicio;
@@ -153,8 +161,8 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
           />
           <Select
             minWidth="200"
-            accessibilityLabel="SELECCIONE SERVCIO"
-            placeholder="SELECCIONE SERVCIO"
+            accessibilityLabel="SELECCIONE SERVICIO"
+            placeholder="SELECCIONE SERVICIO"
             selectedValue={tiposervicio}
             onValueChange={handleTipo}
             variant="outline"
@@ -189,8 +197,17 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
             </Select>
           )}
           <Text>{"\n"}</Text>
-          <AppButton action={Pedido} title="SOLICITAR" />
-          <Loading text="Buscando Rapi Segura" isVisible={isVisibleLoading} />
+
+          <Button
+            colorScheme="yellow"
+            key="lg"
+            size="lg"
+            variant="solid"
+            onPress={() => Pedido()}
+          >
+           SOLICITAR
+           </Button>
+         <Loading text="Buscando Rapi Segura" isVisible={isVisibleLoading} />
         </VStack>
       </KeyboardAvoidingView>
     </>

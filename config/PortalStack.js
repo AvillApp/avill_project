@@ -1,11 +1,21 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createDrawerNavigator } from "@react-navigation/drawer";
+
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItemList,
+  DrawerItem,
+} from '@react-navigation/drawer';
+import Animated from 'react-native-reanimated';
+
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import Portal from "../Screens/Portal";
 import Confirmar from "../Screens/Confirmar";
 import Estado from "../Screens/Estado";
+import Chat from "../Screens/Chat";
 import Viajes from "../Screens/Viajes";
 
 const PortalStack = createStackNavigator(); // Panel de realizar los pedidos y ver el estado
@@ -37,6 +47,14 @@ const PortalStackScreen = () => (
       }}
       component={Estado}
     />
+     <PortalStack.Screen
+      name="Chat"
+      options={{
+        headerTitle: "Chat de viaje",
+        headerShown: true,
+      }}
+      component={Chat}
+    />
   </PortalStack.Navigator>
 );
 
@@ -64,12 +82,25 @@ const ViajesStackScreen = () => (
 const Tabs = createBottomTabNavigator();
 
 const TabsScreen = () => (
-  <Tabs.Navigator>
+  <Tabs.Navigator
+  screenOptions={{
+    tabBarActiveTintColor: 'yellow',
+    tabBarInactiveTintColor: 'white',
+    backgroundColor: '#c6cbef',
+
+    tabBarStyle: {
+      backgroundColor: 'green',
+    },
+  }}
+  >
     <Tabs.Screen
       name="Portal"
       options={{
         headerTitle: "Contacts",
         headerShown: false,
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="home" color={color} size={26} />
+        ),
       }}
       component={PortalStackScreen}
     />
@@ -78,6 +109,9 @@ const TabsScreen = () => (
       options={{
         headerTitle: "Mis Viajes",
         headerShown: false,
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="car" color={color} size={26} />
+        ),
       }}
       component={ViajesStackScreen}
     />
@@ -85,8 +119,38 @@ const TabsScreen = () => (
 );
 
 const AppDrawer = createDrawerNavigator();
+
+
+function CustomDrawerContent({ progress, ...rest }) {
+  // const translateX = Animated.interpolate(progress, {
+  //   inputRange: [0, 1],
+  //   outputRange: [-100, 0],
+  // });
+
+  return (
+    <DrawerContentScrollView {...rest}>
+      <Animated.View>
+        <DrawerItemList {...rest} />
+          <DrawerItem label="Términos y condiciones" onPress={() => alert('Link to help')} />
+          <DrawerItem label="Salir" onPress={() => alert('Link to help')} />
+
+      </Animated.View>
+    </DrawerContentScrollView>
+  );
+}
+
 export default AppDrawerScreen = () => (
-  <AppDrawer.Navigator>
+  <AppDrawer.Navigator
+  
+  drawerContent={(props) => <CustomDrawerContent {...props} />}
+  // screenOptions={{
+  //   drawerStyle: {
+  //     backgroundColor: '#c6cbef',
+  //     width: 240,
+  //   },
+  // }}
+  
+  >
     <AppDrawer.Screen
       name="Tabs"
       component={TabsScreen}
@@ -99,10 +163,10 @@ export default AppDrawerScreen = () => (
     />
     {/* <AppDrawer.Screen
       name="Settings"
-      component={Settings}
       options={{
+        drawerLabel: "Salir",
         gestureEnabled: false,
-      }}
+      }} 
     /> */}
   </AppDrawer.Navigator>
 );

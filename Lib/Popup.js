@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { StyleSheet, View, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Overlay } from "react-native-elements";
@@ -7,6 +7,7 @@ import API from "./Db";
 
 export default function Loading(props) {
   const { isVisible, text, pedido, NotifiyPush, tokenPush, conductor } = props;
+  const [confir, setConfir] = useState(true)
 
   const ChangedEstado = async (est) => {
     const pedido_change = {
@@ -17,7 +18,7 @@ export default function Loading(props) {
 
   const CancelarViaje = async () => {
     const id_user = await AsyncStorage.getItem("id_user");
-
+    setConfir(false)
     // Enviamos primera información
     const titulo = "Cancelación de servicio";
     const descripcion = "Haz cancelado el servicio";
@@ -36,6 +37,7 @@ export default function Loading(props) {
 
   const ConfirmarViaje = async () => {
     // const id_pedido = await AsyncStorage.getItem("id_pedido");
+    setConfir(false)
     const id_user = await AsyncStorage.getItem("id_user");
 
     // Enviamos primera información
@@ -59,6 +61,16 @@ export default function Loading(props) {
     await API.put(`accounts/${conductor}/`, payload);
     ChangedEstado(4); // Confirmar pedido
   };
+
+  const  acciones = () => {
+    return(
+      <>
+      <AppButton title="CONFIRMAR" action={ConfirmarViaje} />
+      <Text>{"\n"}</Text>
+      <AppButton title="CANCELAR" action={CancelarViaje} />
+      </>
+    )
+  }
   return (
     <Overlay
       isVisible={isVisible}
@@ -69,10 +81,10 @@ export default function Loading(props) {
       <View style={styles.view}>
         {text && <Text style={styles.text}>{text}</Text>}
         <Text>{"\n"}</Text>
-        {/* {precio && <Text>Costo: ${precio}</Text>} */}
-        <AppButton title="CONFIRMAR" action={ConfirmarViaje} />
-        <Text>{"\n"}</Text>
-        <AppButton title="CANCELAR" action={CancelarViaje} />
+        {confir && acciones()}
+       
+        {!confir && <Text>Espere por favor ...</Text>}
+        
       </View>
     </Overlay>
   );

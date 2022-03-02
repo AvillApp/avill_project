@@ -4,6 +4,7 @@ import {
   Platform,
   StyleSheet,
   Dimensions,
+  TouchableOpacity
 } from "react-native";
 import {
   KeyboardAvoidingView,
@@ -25,7 +26,7 @@ export default function ViajesForm({ navigation, signIn }) {
 
   const getIdpedido = async () => {
     const id_user = await AsyncStorage.getItem("id_user");
-    const response = await API.get(`orders/?account=${id_user}&format=json`);
+    const response = await API.get(`orders/?account=${id_user}&ordering=-id&format=json`);
     const resUser = response.data;
     setData(resUser); // Logs
   };
@@ -38,16 +39,16 @@ export default function ViajesForm({ navigation, signIn }) {
   }, []);
 
   const HandleSeguimiento = (id) => {
-    console.log("Hizo clic");
-    // navigation.navigate("Estado", {
-    //   pedido: id,
-    // });
+    // console.log("Hizo clic");
+    navigation.navigate("Estado", {
+      pedido: id,
+    });
   };
   return (
     <>
       <KeyboardAvoidingView
         h={{
-          base: "400px",
+          base: "620px",
           lg: "auto",
         }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -57,6 +58,8 @@ export default function ViajesForm({ navigation, signIn }) {
           <FlatList
             data={data}
             renderItem={({ item }) => (
+
+
               <Box
                 borderBottomWidth="1"
                 _dark={{
@@ -66,16 +69,26 @@ export default function ViajesForm({ navigation, signIn }) {
                 pl="4"
                 pr="5"
                 py="2"
+               
               >
+                 <TouchableOpacity
+                   onPress={() => HandleSeguimiento(item.id)}
+                  >
                 <HStack
                   space={3}
                   justifyContent="space-between"
-                  onPress={() => HandleSeguimiento(item.id)}
                 >
-                  <VStack>
+                  <VStack
+                  >
                     <Text>Destino: {item.destino}</Text>
                     <Text>Costo: {item.precio}</Text>
-                    <Text>Fecha: {item.modified}</Text>
+                    <Text>Fecha: {
+                   
+                    item.modified.split('T')[0]}</Text>
+                    <Text>Hora: {
+                    item.modified.split('T')[1].split('.')[0]
+                    
+                    }</Text>
                   </VStack>
                   <Spacer />
                   <Text
@@ -106,6 +119,7 @@ export default function ViajesForm({ navigation, signIn }) {
                     )}
                   </Text>
                 </HStack>
+                </TouchableOpacity>
               </Box>
             )}
             keyExtractor={(item) => item.id}

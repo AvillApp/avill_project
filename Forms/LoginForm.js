@@ -21,10 +21,11 @@ export default function LoginForm({ navigation, signIn }) {
   const [error, setError] = useState(false);
 
   const obtenerUser = async () => {
-    // const id_user = await AsyncStorage.getItem("id_user");
-    // const id_pedido = await AsyncStorage.getItem("id_pedido");
-    // if (id_user) navigation.navigate("app");
-    // if (id_pedido) navigation.navigate("Estado");
+    const id_user = await AsyncStorage.getItem("id_user");
+    const id_pedido = await AsyncStorage.getItem("id_pedido");
+    if (id_user) // console.log("Va a iniciar sesion ") 
+      signIn();
+   // if (id_pedido) navigation.navigate("Estado");
   };
   obtenerUser();
 
@@ -34,34 +35,51 @@ export default function LoginForm({ navigation, signIn }) {
     await AsyncStorage.setItem("nombre", nom.toString());
     await AsyncStorage.setItem("apellidos", ape.toString());
 
+    const lat = await AsyncStorage.getItem("latitude");
+    const long = await AsyncStorage.getItem("longitude");
+
+    if(token!=='')
+      token = "null"
+
     const payload = {
       tokenPush: token,
       name: nom,
       last_name: ape,
+      longitude: long,
+      latitude: lat,
     };
+
+    // Actualizamos cuenta con nuevas coordenadas
     await API.put(`accounts/${id}/`, payload);
     signIn();
   };
 
   const autentication = async () => {
     const tokenPush = await AsyncStorage.getItem("tokenPush");
-    setIsVisibleLoading(true);
-    const response = await API.get(
-      `accounts/?phone=${telefono}&type_persona=1&format=json`
-    );
 
-    response.data.map((dt) => {
-      data = dt.id;
-      nom = dt.name;
-      ape = dt.last_name;
-    });
-    Loguear(data, nom, ape, tokenPush);
-    setIsVisibleLoading(false);
+    if(telefono){
+    
+      const response = await API.get( 
+        `accounts/?phone=${telefono}&type_persona=1&format=json`
+      );
+
+      if(response.data.length>0){
+        setIsVisibleLoading(true);
+        response.data.map((dt) => {
+          data = dt.id;
+          nom = dt.name;
+          ape = dt.last_name;
+        });
+        Loguear(data, nom, ape, tokenPush);
+        setIsVisibleLoading(false);
+      }
+      
+
+    }
+    
+    
   };
 
-  const Register = () => {
-    navigation.navigate("SignUp");
-  };
 
   return (
     <ImageBackground
@@ -69,23 +87,25 @@ export default function LoginForm({ navigation, signIn }) {
       style={{ flex: 1, width: null, height: 900 }}
       resizeMode="cover"
     >
-      <Center flex={1} px="3">
+      <Center flex={1} px="2">
         <Image source={MARCA.LOGO} alt="logo" />
       </Center>
 
-      <KeyboardAvoidingView
+      {/* <KeyboardAvoidingView
         h={{
-          base: "400px",
+          base: "420px",
           lg: "auto",
         }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
+      > */}
+       <>
         <VStack p="6" flex="1">
           <Input
-            style={{ fontSize: 20, color: "#FFFFFF" }}
+            style={{ fontSize: 20, color: "white" }}
             placeholder="Número de teléfono"
             mt="15"
             mb="10"
+            variant="underlined"
             onChange={(e) => setTelefono(e.nativeEvent.text)}
           />
           <Button
@@ -110,7 +130,8 @@ export default function LoginForm({ navigation, signIn }) {
         </VStack>
         {/* <ErrorMessage text="Número de teléfono incorrecto" isVisible={error} /> */}
         <Loading text="Iniciando sesión" isVisible={isVisibleLoading} />
-      </KeyboardAvoidingView>
+      {/* </KeyboardAvoidingView> */}
+      </>
     </ImageBackground>
   );
 }

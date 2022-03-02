@@ -1,22 +1,21 @@
 import React, { useState } from "react";
+import { ImageBackground, Platform, StyleSheet } from "react-native";
 import {
-  StyleSheet,
-  AsyncStorage,
-  View,
+  Center,
   Image,
-  ImageBackground,
+  Input,
+  KeyboardAvoidingView,
+  VStack,
   Text,
-} from "react-native";
-import { Content, Form, Item, Input, Label, Icon } from "native-base";
-import AppButton from "../Lib/plug/AppButton";
-import Loading from "../Lib/plug/Loading";
-import ErrorMessage from "../Lib/plug/Error";
-import validateNumber from "../Lib/utils/Number";
-import { MARCA } from "../Constans/imagenes";
-import { api } from "../Lib/utils/db";
-import axios from "axios";
+  Button,
+} from "native-base";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Loading from "../Lib/Loading";
+import API from "../Lib/Db";
+import validateNumber from "../Lib/Number";
+import { MARCA } from "../Constans/Imagenes";
 
-export default function RegisterForm({ navigation }) {
+export default function LoginForm({ navigation, signIn }) {
   const [isVisibleLoading, setIsVisibleLoading] = useState(false);
   const [nombre, setNombre] = useState();
   const [apellidos, setApellidos] = useState();
@@ -25,35 +24,20 @@ export default function RegisterForm({ navigation }) {
   const [msgError, setmsgError] = useState("");
 
   const obtenerUser = async () => {
-    const id_user = await AsyncStorage.getItem("id_user");
-    if (id_user) navigation.navigate("app");
+   /* const id_user = await AsyncStorage.getItem("id_user");
+    if (id_user) navigation.navigate("app");*/
   };
   obtenerUser();
 
-  const obtenerID = async () => {
-    const infoUser = await fetch(
-      `${api}personas/buscar/${telefono}?format=json`
-    );
-    const resUser = await infoUser.json();
-
-    let data;
-    resUser.map((dt) => {
-      data = dt.id;
-    });
-
-    //console.log("información del ID: ", data)
-    await AsyncStorage.setItem("id_user", data.toString());
-    await AsyncStorage.setItem("nombre", nombre);
-
-    navigation.navigate("app");
-  };
 
   const handleRegister = async () => {
-    setIsVisibleLoading(true);
+    //navigation.navigate("SignIn");
+   
     if (telefono && nombre && apellidos) {
       setError(false);
       if (validateNumber(telefono)) {
         setError(false);
+        // 
 
         const persona = {
           name: nombre,
@@ -62,14 +46,25 @@ export default function RegisterForm({ navigation }) {
           type_persona: 1,
         };
 
-        axios
-          .post(`${api}personas/create/`, persona)
-          .then((response) => {
-            obtenerID();
-          })
-          .catch((error) => {
-            setError(true);
-          });
+
+        const response = await API.get(
+          `accounts/?phone=${telefono}&format=json`
+        );
+        if(response.data.length==0){
+          console.log("prueba")
+          setIsVisibleLoading(true);
+          const regis =  await API.post(`accounts/`, persona);
+          setIsVisibleLoading(false);
+          console.log(regis.data.id)
+      
+         navigation.navigate("SignIn");
+
+        }else{
+        console.log("Telefono ya existe")
+          setIsVisibleLoading(false);
+        }
+        
+
       } else {
         setError(true);
         setmsgError("Teléfono inválido");
@@ -78,77 +73,77 @@ export default function RegisterForm({ navigation }) {
       setmsgError("Complete el formulario");
       setError(true);
     }
+
+
     setIsVisibleLoading(false);
   };
-  const Login = () => {
-    navigation.navigate("Login");
-  };
+
+
   return (
-    <Content
-      ContainerStyle={{
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+    <ImageBackground
+      source={MARCA.FONDO_LOGIN}
+      style={{ flex: 1, width: null, height: 900 }}
+      resizeMode="cover"
     >
-      <ImageBackground
-        source={MARCA.FONDO_LOGIN}
-        style={{ flex: 1, width: null, height: 900 }}
-        resizeMode="cover"
+      {/* <Center flex={1} px="2">
+        <Image source={MARCA.LOGO} alt="logo" />
+      </Center> */}
+      <KeyboardAvoidingView
+        h={{
+          base: "420px",
+          lg: "auto",
+        }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View style={styles.centerLogo}>
-          <Image source={MARCA.LOGO} style={styles.logo} />
-        </View>
-        <ErrorMessage text={msgError} isVisible={error} />
-        <Form>
-          <Item floatingLabel>
-            <Label style={{ color: "#FFFFFF" }}>Nombre</Label>
-            <Input onChange={(e) => setNombre(e.nativeEvent.text)} />
-            <Icon
-              type="MaterialCommunityIcons"
-              name="account"
-              style={{ fontSize: 20, color: "#FFFFFF" }}
-            />
-          </Item>
-          <Item floatingLabel>
-            <Label style={{ color: "#FFFFFF" }}>Apellidos</Label>
-            <Input onChange={(e) => setApellidos(e.nativeEvent.text)} />
-            <Icon
-              type="MaterialCommunityIcons"
-              name="account"
-              style={{ fontSize: 20, color: "#FFFFFF" }}
-            />
-          </Item>
-          <Item floatingLabel>
-            <Label style={{ color: "#FFFFFF" }}>Teléfono celular</Label>
-            <Input
-              onChange={(e) => setTelefono(e.nativeEvent.text)}
-              style={{ fontSize: 20, color: "#FFFFFF" }}
-            />
-            <Icon
-              type="MaterialCommunityIcons"
-              name="cellphone"
-              style={{ fontSize: 20, color: "#FFFFFF" }}
-            />
-          </Item>
-          <View style={styles.butt}>
-            <AppButton action={handleRegister} title="Registrarse" />
-          </View>
-          <View style={styles.txt}>
-            <Text style={styles.txt} onPress={Login}>
-              Si tengo una cuenta, haz clic aquí
-            </Text>
-          </View>
-        </Form>
-        <Loading text="Creando cuenta" isVisible={isVisibleLoading} />
-      </ImageBackground>
-    </Content>
+        <VStack p="6" flex="1">
+          <Input
+            style={{ fontSize: 20, color: "white" }}
+            placeholder="Nombre"
+            mt="15"
+            mb="10"
+            variant="underlined"
+            onChange={(e) => setNombre(e.nativeEvent.text)}
+          />
+           <Input
+            style={{ fontSize: 20, color: "white" }}
+            placeholder="Apellidos"
+            mt="15"
+            mb="10"
+            variant="underlined"
+            onChange={(e) => setApellidos(e.nativeEvent.text)}
+          />
+           <Input
+            style={{ fontSize: 20, color: "white" }}
+            placeholder="Teefono"
+            mt="15"
+            mb="10"
+            variant="underlined"
+            onChange={(e) => setTelefono(e.nativeEvent.text)}
+          />
+          <Button
+            mb="10"
+            colorScheme="yellow"
+            key="lg"
+            size="lg"
+            variant="solid"
+            onPress={() => handleRegister()}
+          >
+            Registrarse
+          </Button>
+        </VStack>
+        {/* <ErrorMessage text="Número de teléfono incorrecto" isVisible={error} /> */}
+        <Loading text="Registrando" isVisible={isVisibleLoading} />
+      </KeyboardAvoidingView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  inputForm: {
-    width: "100%",
+  input: {
     marginTop: 20,
+  },
+  form: {
+    marginTop: 40,
   },
   logo: {
     justifyContent: "center",
@@ -159,28 +154,10 @@ const styles = StyleSheet.create({
     width: 200,
   },
   butt: {
-    marginTop: 20,
+    marginTop: 30,
     alignItems: "center",
-  },
-  icono: {
-    width: 24,
-    height: 24,
-  },
-  iconRight: {
-    color: "#C1C1C1",
-  },
-  btnContainerStyle: {
-    marginTop: 20,
-    width: "95%",
-  },
-  btnRegister: {
-    backgroundColor: "#00a680",
-  },
-  info4: {
-    fontSize: 14,
-    marginTop: 10,
-    marginBottom: 20,
-    textAlign: "center",
+    color: "#FFFFFF",
+    fontSize: 15,
   },
   txt: {
     marginTop: 20,
