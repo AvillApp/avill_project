@@ -1,14 +1,6 @@
 import React, { useState } from "react";
 import { ImageBackground, Platform, StyleSheet } from "react-native";
-import {
-  Center,
-  Image,
-  Input,
-  KeyboardAvoidingView,
-  VStack,
-  Text,
-  Button,
-} from "native-base";
+import { Center, Image, Input, VStack, Text, Button } from "native-base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loading from "../Lib/Loading";
 import API from "../Lib/Db";
@@ -23,13 +15,11 @@ export default function LoginForm({ navigation, signIn }) {
   const obtenerUser = async () => {
     const id_user = await AsyncStorage.getItem("id_user");
     const id_pedido = await AsyncStorage.getItem("id_pedido");
-    if (id_user) // console.log("Va a iniciar sesion ") 
-      signIn();
+    if (id_user) signIn();
   };
   obtenerUser();
 
   const Loguear = async (id, nom, ape, token) => {
-   // console.log("info: ", id);
     await AsyncStorage.setItem("id_user", id.toString());
     await AsyncStorage.setItem("nombre", nom.toString());
     await AsyncStorage.setItem("apellidos", ape.toString());
@@ -37,8 +27,9 @@ export default function LoginForm({ navigation, signIn }) {
     const lat = await AsyncStorage.getItem("latitude");
     const long = await AsyncStorage.getItem("longitude");
 
-    if(token!=='')
-      token = "null"
+    console.log("Tokenpush: ", token)
+
+    if (!token) token = "null";
 
     const payload = {
       tokenPush: token,
@@ -48,21 +39,19 @@ export default function LoginForm({ navigation, signIn }) {
       latitude: lat,
     };
 
+     console.log(payload)
     // Actualizamos cuenta con nuevas coordenadas
-    await API.put(`accounts/${id}/`, payload);
-    signIn();
+    // await API.put(`accounts/${id}/`, payload);
+    // signIn();
   };
 
   const autentication = async () => {
     const tokenPush = await AsyncStorage.getItem("tokenPush");
 
-    if(telefono){
-    
-      const response = await API.get( 
-        `accounts/?phone=${telefono}&type_persona=1&format=json`
-      );
+    if (telefono) {
+      const response = await API.get(`accounts/?phone=${telefono}&format=json`);
 
-      if(response.data.length>0){
+      if (response.data.length > 0) {
         setIsVisibleLoading(true);
         response.data.map((dt) => {
           data = dt.id;
@@ -72,13 +61,8 @@ export default function LoginForm({ navigation, signIn }) {
         Loguear(data, nom, ape, tokenPush);
         setIsVisibleLoading(false);
       }
-      
-
     }
-    
-    
   };
-
 
   return (
     <ImageBackground
@@ -89,15 +73,7 @@ export default function LoginForm({ navigation, signIn }) {
       <Center flex={1} px="2">
         <Image source={MARCA.LOGO} alt="logo" />
       </Center>
-
-      {/* <KeyboardAvoidingView
-        h={{
-          base: "420px",
-          lg: "auto",
-        }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      > */}
-       <>
+      <>
         <VStack p="6" flex="1">
           <Input
             style={{ fontSize: 20, color: "white" }}
@@ -129,7 +105,7 @@ export default function LoginForm({ navigation, signIn }) {
         </VStack>
         {/* <ErrorMessage text="Número de teléfono incorrecto" isVisible={error} /> */}
         <Loading text="Iniciando sesión" isVisible={isVisibleLoading} />
-      {/* </KeyboardAvoidingView> */}
+        {/* </KeyboardAvoidingView> */}
       </>
     </ImageBackground>
   );

@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Platform,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
+import { Platform, StyleSheet, Dimensions } from "react-native";
 import {
   KeyboardAvoidingView,
   VStack,
@@ -11,50 +7,57 @@ import {
   FlatList,
   Box,
   HStack,
-  Spacer,
   Input,
-  Button
+  Button,
 } from "native-base";
-import { Badge } from "react-native-elements";
-import { MaterialIcons } from "@expo/vector-icons";
+import NotifiyPush from "../Lib/Notify";
 import API from "../Lib/Db";
 
-export default function ChatForm({ navigation, signIn, pedido, account }) {
+export default function ChatForm({
+  navigation,
+  signIn,
+  pedido,
+  account,
+  pushToken,
+}) {
   const [data, setData] = useState([]);
   const [msg, setMsg] = useState();
 
   const getIdpedido = async () => {
-    const response = await API.get(`chat/order/?pedido=${pedido}&ordering=-id&format=json`);
+    const response = await API.get(
+      `chat/order/?pedido=${pedido}&ordering=-id&format=json`
+    );
     const resUser = response.data;
     setData(resUser); // Logs
   };
 
-
   useEffect(() => {
-   
-      const interval = setInterval(() => {
-        getIdpedido();
-      }, 2000);
+    const interval = setInterval(() => {
+      getIdpedido();
+    }, 1000);
 
-      return () => {
-        clearInterval(interval);
-      };
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   const HandleSeguimiento = async () => {
-    console.log("Hizo clic");
-
+   
     const payload = {
-        msg: msg,
-        pedido: pedido,
-        account: account
-    }
+      msg: msg,
+      pedido: pedido,
+      account_id: account,
+    };
 
     await API.post(`chat/order/`, payload);
-    setMsg('')
-    // navigation.navigate("Estado", {
-    //   pedido: id,
-    // });
+
+    // Notificamos al usuario para el chat.
+    NotifiyPush(
+      pushToken,
+      msg
+    );
+    
+    setMsg(""); //Vaciamos mensaje
   };
   return (
     <>
@@ -86,9 +89,10 @@ export default function ChatForm({ navigation, signIn, pedido, account }) {
                   onPress={() => HandleSeguimiento(item.id)}
                 >
                   <VStack>
-                    <Text>{item.account}: {item.msg}</Text>
+                    <Text styles={styles.txt}>
+                      {item.account.name}: {item.msg}
+                    </Text>
                   </VStack>
-                  
                 </HStack>
               </Box>
             )}
@@ -96,24 +100,24 @@ export default function ChatForm({ navigation, signIn, pedido, account }) {
           />
         </VStack>
         <Input
-            style={{ fontSize: 20, color: "black" }}
-            placeholder="Introduzca su mensaje"
-            mt="15"
-            mb="2"
-            variant="underlined"
-            value={msg}
-            onChange={(e) => setMsg(e.nativeEvent.text)}
-          />
-         <Button
-            mb="2"
-            colorScheme="yellow"
-            key="lg"
-            size="lg"
-            variant="solid"
-            onPress={() => HandleSeguimiento()}
-          >
-            Enviar
-          </Button>
+          style={{ fontSize: 20, color: "black" }}
+          placeholder="Introduzca su mensaje"
+          mt="15"
+          mb="2"
+          variant="underlined"
+          value={msg}
+          onChange={(e) => setMsg(e.nativeEvent.text)}
+        />
+        <Button
+          mb="2"
+          colorScheme="yellow"
+          key="lg"
+          size="lg"
+          variant="solid"
+          onPress={() => HandleSeguimiento()}
+        >
+          Enviar
+        </Button>
       </KeyboardAvoidingView>
     </>
   );
@@ -144,7 +148,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   txt: {
-    marginTop: 20,
+    marginTop: 10,
     color: "#FFFFFF",
     alignItems: "center",
     fontSize: 18,

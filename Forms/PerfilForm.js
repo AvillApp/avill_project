@@ -6,19 +6,9 @@ import {
 } from "react-native";
 import {
   KeyboardAvoidingView,
-  VStack,
-  Text,
-  FlatList,
-  Box,
-  HStack,
-  Spacer,
-  Input,
   Button
 } from "native-base";
-import { Badge } from "react-native-elements";
-import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import API from "../Lib/Db";
 
 export default function PerfilForm({ navigation, signOut }) {
 
@@ -42,36 +32,7 @@ export default function PerfilForm({ navigation, signOut }) {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         styles={styles.fondo}
       >
-        {/* <VStack p="2" flex="1">
-          <FlatList
-            data={data}
-            renderItem={({ item }) => (
-              <Box
-                borderBottomWidth="1"
-                _dark={{
-                  borderColor: "gray.600",
-                }}
-                borderColor="coolGray.200"
-                pl="4"
-                pr="5"
-                py="2"
-              >
-                <HStack
-                  space={3}
-                  justifyContent="space-between"
-                  onPress={() => HandleSeguimiento(item.id)}
-                >
-                  <VStack>
-                    <Text>{item.account}: {item.msg}</Text>
-                  </VStack>
-                  
-                </HStack>
-              </Box>
-            )}
-            keyExtractor={(item) => item.id}
-          />
-        </VStack> */}
-        
+                
          <Button
             mb="2"
             colorScheme="red"

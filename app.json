@@ -4,6 +4,7 @@
     "slug": "Avill",
     "version": "1.0.0",
     "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
     "icon": "./assets/icons/icon.png",
     "splash": {
       "image": "./assets/splash.png",
@@ -21,13 +22,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icons/icon.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.avill.io",
-      "versionCode": 5,
+      "versionCode": 6,
       "permissions": [
-        "NOTIFICATIONS"
+        "NOTIFICATIONS",
+        "ACCESS_BACKGROUND_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "FOREGROUND_SERVICE",
+        "VIBRATE"
       ],
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json"

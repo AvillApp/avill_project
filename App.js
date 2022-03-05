@@ -1,22 +1,24 @@
-import Constants from "expo-constants";
+import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
-import React, { useRef, useEffect } from "react";
+import * as Location from "expo-location";
+import React, { useRef, useEffect, useState } from "react";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import * as Location from "expo-location";
-
+import Localization from "./Localization";
 import Navigation from "./config/Navigation";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
   }),
 });
+
 async function registerForPushNotificationsAsync() {
   let token;
-  if (Constants.isDevice) {
+  if (Device.isDevice) {
     const { status: existingStatus } =
       await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
@@ -38,48 +40,39 @@ async function registerForPushNotificationsAsync() {
   }
   return token;
 }
+
 export default () => {
   const notificationListener = useRef();
   const responseListener = useRef();
+  const [conce, setConce] = useState(true);
+
+  const Permiso = (id) => {
+    setConce(id);
+  };
 
   const SaveTokenPush = async (token) => {
     await AsyncStorage.setItem("tokenPush", token.toString());
-  };
 
-  const SaveLocation = async (lat, long) => {
-    await AsyncStorage.setItem("latitude", lat.toString());
-    await AsyncStorage.setItem("longitude", long.toString());
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === "granted") Permiso(true);
+    else Permiso(false);
   };
 
   useEffect(() => {
-    if (Constants.isDevice && Platform.OS !== "web") {
-      registerForPushNotificationsAsync().then((token) => {
-        SaveTokenPush(token);
-      });
-      responseListener.current =
-        Notifications.addNotificationResponseReceivedListener((response) =>
-          console.log(response)
-        );
-      return () => {
-        Notifications.removeNotificationSubscription(notificationListener);
-        Notifications.removeNotificationSubscription(responseListener);
-      };
-    }
+    //if (Device.isDevice && Platform.OS !== "web") {
+    registerForPushNotificationsAsync().then((token) => {
+      console.log("Prueba", token)
+
+      SaveTokenPush(token);
+    });
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) =>
+        console.log(response)
+      );
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
   });
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permiso denegado");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-
-      SaveLocation(location.coords.latitude, location.coords.longitude);
-    })();
-  }, []);
-
-  return <Navigation />;
+  return <>{conce ? <Navigation /> : <Localization Permiso={Permiso} />}</>;
 };

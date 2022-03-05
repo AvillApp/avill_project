@@ -5,7 +5,7 @@ import {
   VStack,
   Text,
   Select,
-  Button
+  Button,
 } from "native-base";
 import { Avatar, List } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -88,8 +88,6 @@ export default function PedidoForm({ navigation, pedido }) {
       }
       if (resUser.vehiculo !== null) {
         if (conductor.nombre === "") {
-
-         
           setConductor({
             nombre:
               resUser.vehiculo.persona.name +
@@ -158,7 +156,11 @@ export default function PedidoForm({ navigation, pedido }) {
           "¿Aceptar pedido? \n \n Valor:" +
             resUser.precio +
             "\n Tiempo: " +
-            resUser.tiempo
+            resUser.tiempo+
+            "\n Placa: " +
+            conductor.placa
+            
+            
         );
         setSearchSegui(false); // No sincronice por el momento.
       }
@@ -213,8 +215,7 @@ export default function PedidoForm({ navigation, pedido }) {
   };
 
   const Calificar = async () => {
-
-    if(conductor.id){
+    if (conductor.id) {
       const payloadAccount = {
         puntos: puntos,
         account: conductor.id,
@@ -222,7 +223,6 @@ export default function PedidoForm({ navigation, pedido }) {
       };
       await API.post(`ratting/account/`, payloadAccount);
     }
-   
 
     const payloadPedido = {
       puntos: puntos,
@@ -230,9 +230,6 @@ export default function PedidoForm({ navigation, pedido }) {
       realizado_by: infoViaje.id,
     };
 
-    // Registramos calificació al conductor
-    
-   
     // Registramos calificació del pedido
     await API.post(`ratting/order/`, payloadPedido);
     setDisableRatting(true);
@@ -243,15 +240,13 @@ export default function PedidoForm({ navigation, pedido }) {
     navigation.goBack("Inicio");
   };
 
-
   const Chatear = () => {
-    console.log("Dato de la cuenta: ", infoViaje.id)
     navigation.navigate("Chat", {
       pedido: pedido,
-      account: infoViaje.id, 
+      account: infoViaje.id,
+      pushToken: conductor.tokenPush,
     });
-
-  }
+  };
 
   return (
     <>
@@ -264,14 +259,18 @@ export default function PedidoForm({ navigation, pedido }) {
         styles={styles.fondo}
       >
         <VStack p="3" flex="1">
+        {isVisibleLoading && (
           <Popup
             text={txt}
             isVisible={isVisibleLoading}
             pedido={pedido}
             tokenPush={conductor.tokenPush}
             conductor={conductor.id}
+            photo={conductor.photo}
             NotifiyPush={NotifiyPush}
+
           />
+        )}
           <List.Section>
             <List.Accordion
               title="Info. del viaje"
@@ -340,7 +339,7 @@ export default function PedidoForm({ navigation, pedido }) {
                   variant="solid"
                   onPress={() => Chatear()}
                 >
-                Chat
+                  Chat
                 </Button>
               </View>
             )}

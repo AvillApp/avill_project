@@ -8,6 +8,7 @@ export default function Chat({ navigation, route }) {
 
   const pedidoGet = route.params.pedido;
   const accountGet = route.params.account;
+  const pushTokenGet = route.params.pushToken;
 
   return (
     <NativeBaseProvider>
@@ -16,6 +17,7 @@ export default function Chat({ navigation, route }) {
         navigation={navigation}
         pedido={pedidoGet} 
         account={accountGet} 
+        pushToken={pushTokenGet}
       />
     </NativeBaseProvider>
   );

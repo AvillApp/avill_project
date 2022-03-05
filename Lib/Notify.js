@@ -1,13 +1,9 @@
 export default NotifiyPush = async (tokenPush, body) => {
-  //   console.log("Ingresó aquí");
-  // console.log("Token del conductor: ", tokenPush);
-
-  if(tokenPush !== '') {
-      await envio();
+  if (tokenPush !== "") {
+    await envio();
   }
 
   async function envio() {
-
     const message = {
       to: tokenPush,
       sound: "default",
@@ -25,6 +21,5 @@ export default NotifiyPush = async (tokenPush, body) => {
       },
       body: JSON.stringify(message),
     });
-
   }
 };
