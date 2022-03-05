@@ -41,8 +41,8 @@ export default function LoginForm({ navigation, signIn }) {
 
      console.log(payload)
     // Actualizamos cuenta con nuevas coordenadas
-    // await API.put(`accounts/${id}/`, payload);
-    // signIn();
+    await API.put(`accounts/${id}/`, payload);
+    signIn();
   };
 
   const autentication = async () => {
