@@ -27,8 +27,6 @@ export default function LoginForm({ navigation, signIn }) {
     const lat = await AsyncStorage.getItem("latitude");
     const long = await AsyncStorage.getItem("longitude");
 
-    console.log("Tokenpush2: ", token)
-
     if (!token) token = "null";
 
     const payload = {
@@ -39,9 +37,8 @@ export default function LoginForm({ navigation, signIn }) {
       latitude: lat,
     };
 
-     console.log(payload)
-    // Actualizamos cuenta con nuevas coordenadas
     await API.put(`accounts/${id}/`, payload);
+
     signIn();
   };
 
@@ -60,7 +57,7 @@ export default function LoginForm({ navigation, signIn }) {
         });
         Loguear(data, nom, ape, tokenPush);
         setIsVisibleLoading(false);
-      }
+      } else setIsVisibleLoading(false);
     }
   };
 

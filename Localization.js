@@ -1,32 +1,94 @@
-import React, { useState, useEffect } from "react";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+import * as Location from "expo-location";
+
+import React, { useRef, useState, useEffect } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
 import { Center, VStack, Text, Button, NativeBaseProvider } from "native-base";
-import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MARCA } from "./Constans/Imagenes";
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Device.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+  } else {
+    console.log("Must use physical device for Push Notifications");
+  }
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+  return token;
+}
+
 export default function Localization({ Permiso }) {
   const [errorMsg, setErrorMsg] = useState(null);
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
   //Guardamos localización.
   const SaveLocation = async (lat, long) => {
     await AsyncStorage.setItem("latitude", lat.toString());
     await AsyncStorage.setItem("longitude", long.toString());
 
+    console.log("Coordenadsa: ", lat);
     if (lat) Permiso(true); // concender permiso.
   };
 
-  const Permitir = async () => {
+  const Loca = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      setErrorMsg("Permiso denegado");
+    if (status === "granted") {
+      let location = await Location.getCurrentPositionAsync({});
+      SaveLocation(location.coords.latitude, location.coords.longitude);
       return;
-    }
-
-    let location = await Location.getCurrentPositionAsync({});
-
-    SaveLocation(location.coords.latitude, location.coords.longitude);
+    } else console.log("No tiene permisos");
   };
+
+  const SaveTokenPush = async (token) => {
+    await AsyncStorage.setItem("tokenPush", token.toString());
+    Loca();
+  };
+
+  const Permitir = () => {
+    registerForPushNotificationsAsync().then((token) => {
+      SaveTokenPush(token);
+    });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) =>
+        console.log("Prueba")
+      );
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
+  };
+
+  // Verificamos si tiene los permisos otorgados.
+
+  useEffect(() => {
+    Permitir();
+  });
 
   return (
     <NativeBaseProvider>
