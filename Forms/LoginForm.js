@@ -27,7 +27,7 @@ export default function LoginForm({ navigation, signIn }) {
     const lat = await AsyncStorage.getItem("latitude");
     const long = await AsyncStorage.getItem("longitude");
 
-    console.log("Tokenpush: ", token)
+    console.log("Tokenpush2: ", token)
 
     if (!token) token = "null";
 
