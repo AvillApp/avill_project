@@ -7,15 +7,23 @@ import AppButton from "./AppButton";
 import API from "./Db";
 
 export default function Loading(props) {
-  const { isVisible, text, pedido, NotifiyPush, tokenPush, conductor, photo } =
-    props;
+  const {
+    isVisible,
+    text,
+    pedido,
+    NotifiyPush,
+    tokenPush,
+    conductor,
+    photo,
+    vehiculo,
+  } = props;
   const [confir, setConfir] = useState(true);
 
   const ChangedEstado = async (est) => {
     const pedido_change = {
       estado: est,
     };
-    const response = await API.put(`orders/${pedido}/`, pedido_change);
+    await API.put(`orders/${pedido}/`, pedido_change);
   };
 
   const CancelarViaje = async () => {
@@ -32,7 +40,14 @@ export default function Loading(props) {
       realizado_by: parseInt(id_user),
     };
 
+    const payload = {
+      // Desbloqueamos el vehículo
+      estado: true,
+    };
+
+    await API.put(`cars/${vehiculo}/`, payload);
     const response3 = await API.post(`activiorders/`, logs_pedido);
+
     NotifiyPush(tokenPush, "El cliente ha cancelado el viaje!");
     ChangedEstado(8); // Cancelar pedido
   };
@@ -54,13 +69,13 @@ export default function Loading(props) {
     };
 
     const payload = {
-      estado: 2,
+      // Bloqueamos el vehículo
+      estado: false,
     };
+    await API.put(`cars/${vehiculo}/`, payload);
     await API.post(`activiorders/`, logs_pedido);
-    //if(tokenPush!=="")
+
     NotifiyPush(tokenPush, "El cliente ha confirmado tu viaje!");
-    // Bloqueamos  conductor
-    await API.put(`accounts/${conductor}/`, payload);
     ChangedEstado(4); // Confirmar pedido
   };
 

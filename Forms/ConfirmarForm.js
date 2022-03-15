@@ -15,15 +15,22 @@ import AppButton from "../Lib/AppButton";
 import Loading from "../Lib/Loading";
 import API from "../Lib/Db";
 import NotifiyPush from "../Lib/Notify";
+import Alerta from "../Lib/Alerta";
 
 export default function ConfirmarForm({ navigation, direccion, emision }) {
   const [indicacion, setIndicacion] = useState("");
-  const [telefono, setTelefono] = useState("");
   const [tiposervicio, setTipoServicio] = useState();
   const [listTipoServ, setListTipoServ] = useState([]);
   const [isVisibleLoading, setIsVisibleLoading] = useState(false);
   const [servicio, setServicio] = useState();
   const [listServicio, setListservicio] = useState([]);
+  const [alert, setAlert] = useState(false);
+  const [texto, setTexto] = useState({
+    title: "",
+    status: "",
+    txt: "",
+  });
+
   const [ubicacion, setUbicacion] = useState({
     latitude: "",
     longitude: "",
@@ -40,7 +47,6 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
-      
     };
     fetch();
     // buscarLocation()
@@ -63,69 +69,83 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
 
   const Pedido = async () => {
     if (Direccion && indicacion) {
-      setIsVisibleLoading(true);
-      const id_user = await AsyncStorage.getItem("id_user");
+      // Buscamos los vehículos que estén disponibles con ese servicio.
 
-      const pedido = {
-        emision: Emision,
-        destino: Direccion,
-        indicacion: indicacion,
-        longitude: ubicacion.longitude,
-        latitude: ubicacion.latitude,
-        telealt: parseInt(telefono),
-        estado: 3,
-        account: parseInt(id_user),
-        solicitud: servicio,
-      };
+      const valueServ = servicio.split(",");
+      console.log(valueServ[0]);
 
-     // console.log(pedido);
-      //Enviamos orden.
-      const response2 = await API.post(`orders/`, pedido);
+      const response4 = await API.get(
+        `cars/?servicio=${valueServ[0]}&estado=1&format=json`
+      );
 
-      await AsyncStorage.setItem("pedido", response2.data.id.toString());
+      if (response4.data.length) {
+        setIsVisibleLoading(true);
+        const id_user = await AsyncStorage.getItem("id_user");
 
-      if (ubicacion.longitude && ubicacion.latitude){
-        const payload ={
+        const pedido = {
+          emision: Emision,
+          destino: Direccion,
+          indicacion: indicacion,
           longitude: ubicacion.longitude,
           latitude: ubicacion.latitude,
+          estado: 3,
+          account: parseInt(id_user),
+          solicitud: valueServ[1],
+        };
+
+        console.log(pedido);
+        // //Enviamos orden.
+        const response2 = await API.post(`orders/`, pedido);
+
+        await AsyncStorage.setItem("pedido", response2.data.id.toString());
+
+        if (ubicacion.longitude && ubicacion.latitude) {
+          const payload = {
+            longitude: ubicacion.longitude,
+            latitude: ubicacion.latitude,
+          };
+
+          await API.put(`accounts/${parseInt(id_user)}/`, payload);
         }
-        
-        console.log("info de coordenadas: ", payload)
-        // Atrapamos coordenada actualizada del usuario..
-        await API.put(`accounts/${parseInt(id_user)}/`, payload);
+
+        // Enviamos primera información
+        const titulo = "Solicitud de servicio seguro ";
+        const descripcion = "Haz solicitado un(a) " + servicio;
+
+        const logs_pedido = {
+          title: titulo,
+          description: descripcion,
+          pedido: parseInt(response2.data.id),
+          realizado_by: parseInt(id_user),
+        };
+
+        await API.post(`activiorders/`, logs_pedido);
+
+        response4.data.map((dt) => {
+          //console.log("estado: ", dt.persona.tokenPush);
+          if (dt.persona.tokenPush !== null) {
+            NotifiyPush(
+              dt.persona.tokenPush,
+              "Hay un nuevo servicio en espera"
+            );
+          }
+        });
+
+        setIsVisibleLoading(false);
+        navigation.navigate("Estado", {
+          pedido: response2.data.id,
+        });
+      } else {
+        setTexto({
+          title: "Ops!",
+          status: "warning",
+          txt: "Lo siento, ningún vehículo disponible, intente buscar otro vehiculo",
+        });
+        setAlert(true);
       }
-      
-     
-      
-      // Enviamos primera información
-      const titulo = "Solicitud de servicio seguro ";
-      const descripcion = "Haz solicitado un(a) " + servicio;
-
-      const logs_pedido = {
-        title: titulo,
-        description: descripcion,
-        pedido: parseInt(response2.data.id),
-        realizado_by: parseInt(id_user),
-      };
-      
-      setIsVisibleLoading(false);
-      const response3 = await API.post(`activiorders/`, logs_pedido);
-
-      // Mandar ordenes a los conductores solo activos o disponibles
-      const response4 = await API.get(
-        `accounts/?type_persona=3&estado=1&format=json`
-      );
-      //console.log(response4.data);
-      response4.data.map((dt) => {
-        if (dt.tokenPush !== null)
-          NotifiyPush(dt.tokenPush, "Hay un nuevo pedido en espera");
-      });
-      navigation.navigate("Estado", {
-        pedido: response2.data.id,
-      });
     }
-    // else setError(true);
   };
+
   return (
     <>
       <KeyboardAvoidingView
@@ -174,7 +194,6 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
             placeholderTextColor="black"
             mt={1}
           >
-           
             {listTipoServ.map((serv) => (
               <Select.Item label={serv.nombre} value={serv.id} key={serv.id} />
             ))}
@@ -185,7 +204,10 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
               accessibilityLabel="SELECCIONE VEHICULO"
               placeholder="SELECCIONE VEHICULO"
               selectedValue={servicio}
-              onValueChange={(itemValue, itemIndex) => setServicio(itemValue)}
+              onValueChange={(itemValue, itemIndex, itemLabel) => {
+                setServicio(itemValue);
+                setAlert(false);
+              }}
               variant="outline"
               placeholderTextColor="black"
               mt={1}
@@ -195,13 +217,12 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
                 <Select.Item
                   key={datos2.id}
                   label={datos2.nombre}
-                  value={datos2.nombre}
+                  value={`${datos2.id},${datos2.nombre}`}
                 />
               ))}
             </Select>
           )}
           <Text>{"\n"}</Text>
-
           <Button
             colorScheme="yellow"
             key="lg"
@@ -209,9 +230,17 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
             variant="solid"
             onPress={() => Pedido()}
           >
-           SOLICITAR
-           </Button>
-         <Loading text="Buscando Rapi Segura" isVisible={isVisibleLoading} />
+            SOLICITAR
+          </Button>
+          <Loading text="Buscando Rapi Segura" isVisible={isVisibleLoading} />
+          <Text>{"\n"}</Text>
+          {alert && (
+            <Alerta
+              title={texto.title}
+              texto={texto.txt}
+              status={texto.status}
+            />
+          )}
         </VStack>
       </KeyboardAvoidingView>
     </>

@@ -47,9 +47,10 @@ export default function PedidoForm({ navigation, pedido }) {
     tiempo: "",
     tokenPush: "",
     id: "",
+    vehiculo: "",
   });
 
-  const Changed2Estado = async (est, conductor) => {
+  const Changed2Estado = async (est, vehiculo) => {
     setSeguiEstado(est);
     const pedido_change = {
       estado: est,
@@ -57,8 +58,8 @@ export default function PedidoForm({ navigation, pedido }) {
     // console.log(pedido_change);
     //console.log("token del conductor2: ", conductor.tokenPush);
     await API.put(`ordersup/${pedido}/`, pedido_change);
-    await API.put(`accounts/${conductor}/`, {
-      estado: 1,
+    await API.put(`cars/${vehiculo}/`, {
+      estado: true,
     });
 
     NotifiyPush(conductor.tokenPush, "El cliente ha confirmado tu viaje!");
@@ -98,6 +99,7 @@ export default function PedidoForm({ navigation, pedido }) {
             tiempo: resUser.tiempo,
             tokenPush: resUser.vehiculo.persona.tokenPush,
             id: resUser.vehiculo.persona.id,
+            vehiculo: resUser.vehiculo.id,
           });
           setSearchInfo(false);
         }
@@ -268,6 +270,7 @@ export default function PedidoForm({ navigation, pedido }) {
             conductor={conductor.id}
             photo={conductor.photo}
             NotifiyPush={NotifiyPush}
+            vehiculo={conductor.vehiculo}
 
           />
         )}
@@ -323,7 +326,7 @@ export default function PedidoForm({ navigation, pedido }) {
                   placeholder="¿MUY DEMORADO?"
                   selectedValue={seguiEstado}
                   onValueChange={(itemValue, itemIndex) =>
-                    Changed2Estado(itemValue, conductor.id)
+                    Changed2Estado(itemValue, conductor.vehiculo)
                   }
                   variant="outline"
                   placeholderTextColor="black"
