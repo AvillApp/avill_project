@@ -63,7 +63,7 @@ export default function ChatForm({
     <>
       <KeyboardAvoidingView
         h={{
-          base: "420px",
+          base: "620px",
           lg: "auto",
         }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}

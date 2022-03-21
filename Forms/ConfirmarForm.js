@@ -150,7 +150,7 @@ export default function ConfirmarForm({ navigation, direccion, emision }) {
     <>
       <KeyboardAvoidingView
         h={{
-          base: "400px",
+          base: "620px",
           lg: "auto",
         }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}

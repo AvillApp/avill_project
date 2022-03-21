@@ -90,7 +90,7 @@ export default function LoginForm({ navigation, signIn }) {
       </Center> */}
       <KeyboardAvoidingView
         h={{
-          base: "420px",
+          base: "620px",
           lg: "auto",
         }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}

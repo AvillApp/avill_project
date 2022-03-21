@@ -26,7 +26,7 @@ export default function PerfilForm({ navigation, signOut }) {
     <>
       <KeyboardAvoidingView
         h={{
-          base: "400px",
+          base: "620px",
           lg: "auto",
         }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
