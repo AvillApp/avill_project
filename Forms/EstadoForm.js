@@ -72,7 +72,6 @@ export default function PedidoForm({ navigation, pedido }) {
   };
 
   const getInfo = async () => {
-    //const pedido = await AsyncStorage.getItem("pedido");
 
     if (pedido) {
       const resUser = await infoPedido(pedido);
@@ -170,7 +169,7 @@ export default function PedidoForm({ navigation, pedido }) {
   };
 
   useEffect(() => {
-    if (seguimiento <= 4) {
+    if (seguimiento <= 3) {
       const interval = setInterval(() => {
         getInfo();
       }, 2000);
@@ -179,7 +178,7 @@ export default function PedidoForm({ navigation, pedido }) {
         clearInterval(interval);
       };
     }
-  }, []);
+  }, [seguimiento]);
 
   const labels = [
     "Solicitado",
@@ -254,7 +253,7 @@ export default function PedidoForm({ navigation, pedido }) {
     <>
       <KeyboardAvoidingView
         h={{
-          base: "600px",
+          base: "620px",
           lg: "auto",
         }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -293,7 +292,7 @@ export default function PedidoForm({ navigation, pedido }) {
               >
                 <View>
                   <Avatar.Image
-                    size={55}
+                    size={70}
                     source={{
                       uri: conductor.photo,
                     }}

@@ -114,7 +114,7 @@ export default function LoginForm({ navigation, signIn }) {
           />
            <Input
             style={{ fontSize: 20, color: "white" }}
-            placeholder="Teefono"
+            placeholder="Teléfono"
             mt="15"
             mb="10"
             variant="underlined"

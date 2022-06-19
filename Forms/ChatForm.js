@@ -42,7 +42,6 @@ export default function ChatForm({
   }, []);
 
   const HandleSeguimiento = async () => {
-   
     const payload = {
       msg: msg,
       pedido: pedido,
@@ -52,21 +51,17 @@ export default function ChatForm({
     await API.post(`chat/order/`, payload);
 
     // Notificamos al usuario para el chat.
-    NotifiyPush(
-      pushToken,
-      msg
-    );
-    
+    NotifiyPush(pushToken, msg);
+
     setMsg(""); //Vaciamos mensaje
   };
   return (
     <>
       <KeyboardAvoidingView
-        h={{
-          base: "620px",
-          lg: "auto",
-        }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        
+        behavior="padding"
+        style={styles.container}
+        // behavior={Platform.OS === "ios" ? "padding" : "height"}
         styles={styles.fondo}
       >
         <VStack p="2" flex="1">
@@ -124,6 +119,10 @@ export default function ChatForm({
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+
   input: {
     marginTop: 20,
   },

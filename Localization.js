@@ -68,8 +68,22 @@ export default function Localization({ Permiso }) {
     await AsyncStorage.setItem("tokenPush", token.toString());
     Loca();
   };
+  const reviewing = async () => {
+
+    console.log("Ingresó aquí")
+    tokenReview = await AsyncStorage.getItem("tokenPush");
+    //tokenReview = await AsyncStorage.setItem("tokenPush", "algo");
+    locationReview = await AsyncStorage.getItem("latitude");
+    
+   // Loca();
+
+    if (tokenReview && locationReview) Permiso(true); // concender permiso.
+    else return false;
+  };
 
   const Permitir = () => {
+    reviewing(); // Revisamos si tiene token y ubica
+
     registerForPushNotificationsAsync().then((token) => {
       SaveTokenPush(token);
     });

@@ -26,13 +26,14 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.avill.io",
-      "versionCode": 9,
+      "versionCode": 13,
       "permissions": [
         "NOTIFICATIONS",
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
         "FOREGROUND_SERVICE",
         "VIBRATE"
+
       ],
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json"

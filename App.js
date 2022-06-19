@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import Localization from "./Localization";
+import React, { useState } from "react";
 import Navigation from "./config/Navigation";
 
 export default () => {
