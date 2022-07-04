@@ -6,4 +6,6 @@ export const MARCA = {
   FONDO_LOGIN: require("../assets/images/AVILL-21.png"),
   FONDO_MAPA: require("../assets/images/AVILL-35.png"),
   FONDO_MAPA2: require("../assets/images/map.png"),
+  DRIVER: require("../assets/images/driver.png"),
+  USER: require("../assets/images/user.png"),
 };

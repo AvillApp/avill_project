@@ -51,7 +51,7 @@ export default function Localization({ Permiso }) {
     await AsyncStorage.setItem("latitude", lat.toString());
     await AsyncStorage.setItem("longitude", long.toString());
 
-    console.log("Coordenadsa: ", lat);
+    //console.log("Coordenadsa: ", lat);
     if (lat) Permiso(true); // concender permiso.
   };
 

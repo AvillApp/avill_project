@@ -1,7 +1,12 @@
-// import * as Location from "expo-location";
+import * as Location from "expo-location";
 // import * as Network from "expo-network";
 import React, { useState, useEffect } from "react";
 import { Platform, StyleSheet, Dimensions } from "react-native";
+import MapView, { Marker, Polyline } from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { GOOGLE_MAPS_KEY, GOOGLE_MAPS_AUTOCOMPLETE } from "@env";
+
 import {
   Input,
   KeyboardAvoidingView,
@@ -16,6 +21,7 @@ import Loading from "../Lib/Loading";
 import API from "../Lib/Db";
 import NotifiyPush from "../Lib/Notify";
 import Alerta from "../Lib/Alerta";
+import { MARCA } from "../Constans/Imagenes";
 
 export default function PortalForm({ navigation, signIn }) {
   const [searcLoc, setSarchLoc] = useState(false);
@@ -33,6 +39,16 @@ export default function PortalForm({ navigation, signIn }) {
     title: "",
     status: "",
     txt: "",
+  });
+
+  const [origin, setOrigin] = useState({
+    latitude: 6.2541314,
+    longitude: -75.563485,
+  });
+
+  const [destination, setDestination] = useState({
+    latitude: 6.2201106,
+    longitude: -75.5982532,
   });
 
   // const NuevoPedido = () => {
@@ -90,17 +106,17 @@ export default function PortalForm({ navigation, signIn }) {
     fetch();
   }, []);
 
-  const handleTipo = async (value) => {
-    setServicio(value);
+  // const handleTipo = async (value) => {
+  //   setServicio(value);
 
-    // const fetch = async () => {
-    //   const response = await API.get(
-    //     `services/?type_servicios=${value}&format=json`
-    //   );
-    //   setListservicio(response.data);
-    // };
-    // fetch();
-  };
+  //   // const fetch = async () => {
+  //   //   const response = await API.get(
+  //   //     `services/?type_servicios=${value}&format=json`
+  //   //   );
+  //   //   setListservicio(response.data);
+  //   // };
+  //   // fetch();
+  // };
 
   const Pedido = async () => {
     setAlert(false);
@@ -216,7 +232,134 @@ export default function PortalForm({ navigation, signIn }) {
         styles={styles.fondo}
       >
         <VStack p="2" flex="1">
-          <Input
+          <GooglePlacesAutocomplete
+            placeholder="Donde estas?"
+            onPress={(data, details = null) => {
+              // 'details' is provided when fetchDetai
+
+              setOrigin({
+                latitude: details.geometry.location.lat,
+                longitude: details.geometry.location.lng,
+              });
+              // console.log("latidude", details.geometry.location.lat)
+              // console.log("longitude", details.geometry.location.lng)
+            }}
+            query={{
+              key: GOOGLE_MAPS_KEY,
+              language: "en",
+            }}
+            styles={{
+              textInputContainer: {
+                backgroundColor: 'grey',
+              },
+              textInput: {
+                height: 38,
+                color: '#5d5d5d',
+                fontSize: 16,
+              },
+              predefinedPlacesDescription: {
+                color: '#1faadb',
+              },
+            }}
+            // currentLocation={true}
+            // fetchDetails={true}
+          />
+
+          {/* <GooglePlacesAutocomplete
+            placeholder="Donde vamos?"
+            onPress={(data, details = null) => {
+              // 'details' is provided when fetchDetai
+
+              setOrigin({
+                latitude: details.geometry.location.lat,
+                longitude: details.geometry.location.lng,
+              });
+              // console.log("latidude", details.geometry.location.lat)
+              // console.log("longitude", details.geometry.location.lng)
+            }}
+            query={{
+              key: GOOGLE_MAPS_KEY,
+              language: "en",
+            }}
+            // currentLocation={true}
+            // fetchDetails={true}
+          /> */}
+
+          {/* <Select
+            minWidth="200"
+            accessibilityLabel="SERVICIO A SOLICITAR"
+            placeholder="SERVICIO A SOLICITAR"
+            selectedValue={servicio}
+            onValueChange={(itemValue, itemIndex, itemLabel) => {
+              setServicio(itemValue);
+              setAlert(false);
+            }}
+            variant="outline"
+            style={{ fontSize: 20 }}
+            placeholderTextColor="black"
+            mt={1}
+          >
+            {listTipoServ.map((serv) => (
+              <Select.Item
+                label={`${serv.type_servicios.nombre} - ${serv.nombre}`}
+                value={`${serv.id},${serv.nombre}`}
+                key={serv.id}
+              />
+            ))}
+          </Select> */}
+          {/* <GooglePlacesAutocomplete
+            placeholder="A dónde vamos?"
+            onPress={(data, details = null) => {
+              // 'details' is provided when fetchDetails = true
+              console.log("info", data);
+              console.log("datails:", details)
+            }}
+            query={{
+              key: GOOGLE_MAPS_KEY,
+              language: "en",
+            }}
+            currentLocation={true}
+            fetchDetails={true}
+            // GoogleReverseGeocodingQuery={{
+              
+            // }}
+          /> */}
+          {/* <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: origin.latitude,
+              longitude: origin.longitude,
+              latitudeDelta: 0.12,
+              longitudeDelta: 0.08,
+            }}
+          >
+            <Marker
+              draggable
+              coordinate={origin}
+              image={MARCA.USER}
+              onDragEnd={(direction) =>
+                setOrigin(direction.nativeEvent.coordinate)
+              }
+            />
+
+            <Marker
+              draggable
+              coordinate={destination}
+              image={MARCA.DRIVER}
+              onDragEnd={(direction) =>
+                setDestination(direction.nativeEvent.coordinate)
+              }
+            />
+            <MapViewDirections
+              origin={origin}
+              destination={destination}
+              apikey={GOOGLE_MAPS_KEY}
+              strokeColor="black"
+              strokeWidth={4}
+            />
+          </MapView> */}
+
+          {/* <Input
             style={{ fontSize: 20, color: "black" }}
             placeholder="¿Dónde estas? (*)"
             mt="15"
@@ -241,29 +384,8 @@ export default function PortalForm({ navigation, signIn }) {
               base: "100%",
             }}
             style={{ fontSize: 20 }}
-          />
-          <Select
-            minWidth="200"
-            accessibilityLabel="SERVICIO A SOLICITAR"
-            placeholder="SERVICIO A SOLICITAR"
-            selectedValue={servicio}
-            onValueChange={(itemValue, itemIndex, itemLabel) => {
-              setServicio(itemValue);
-              setAlert(false);
-            }}
-            variant="outline"
-            style={{ fontSize: 20 }}
-            placeholderTextColor="black"
-            mt={1}
-          >
-            {listTipoServ.map((serv) => (
-              <Select.Item
-                label={`${serv.type_servicios.nombre} - ${serv.nombre}`}
-                value={`${serv.id},${serv.nombre}`}
-                key={serv.id}
-              />
-            ))}
-          </Select>
+          /> */}
+
           {/* {tiposervicio >= 1 && (
             <Select
               minWidth="200"
@@ -360,7 +482,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   map: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
+    marginTop: 50,
+    width: "70%",
+    height: "70%",
+    // width: Dimensions.get("window").width,
+    // height: Dimensions.get("window").height,
   },
 });
